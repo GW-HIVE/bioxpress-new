@@ -1,0 +1,59 @@
+
+1) Loading TCGA Tumor-Normal DE data
+
+    data_file=generated/bioxpress-final.xref.csv
+        new_load_feature.py
+        new_load_xref.py
+    
+    data_file=generated/bioxpress-final.domap.csv
+        load_tissue.py
+        load_doid.py
+        load_sample.py
+
+    data_file=generated/bioxpress-final.de.csv
+        load_de.py
+        load_boxplot.py
+    
+    ##add-doid-in-sample-table.py
+
+
+2) Loading Bgee and text mining data
+scriptPath=./archive/v-2.1/externalDb
+dataPath = /data/projects/bioxpress/downloads/bgee/current/
+
+
+This procedure is used to load external datasets into BioXpress 
+database. A JSON file must be create to store information about
+file name/description and column name/description for each file needed
+to be added in.
+
+************************************************************************
+*Step 1. Load data to biox_datasets table
+************************************************************************
+script: $scriptPath/load_datasets.py
+location: $dataPath/queryValues.json
+protocol: This step is to load the file name and description from 
+    customized JSON file. Each data file needed to be loaded must
+        have a corresponding JSON file for file and column description.
+
+
+        ************************************************************************
+        *Step 2. Load data to biox_dataset_fields table
+        ************************************************************************
+        script: $scriptPath/load_dataset_fields.py
+        location: $dataPath/queryValues.json
+        protocol: This step is to load the column names and their description
+            from curstomized JSON file. 
+
+
+            ************************************************************************
+            *Step 3. Load data to biox_dataset_numericvalue and 
+                 biox_dataset_stringvalue tables
+                 ************************************************************************
+                 script: $scriptPath/load_dataset_allValues.py
+                 location: $dataPath/[txt, tsv,csv] file 
+                 protocol: This step is to read through the file needed to be loaded,
+                    and to add numeric values to box_dataset_numericvalue table and
+                        to add string values to biox_dataset_stringvalue table. 
+
+
