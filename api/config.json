@@ -1,0 +1,251 @@
+{
+        "project": "bioxpress-api",
+        "api_port": {
+                "prd": "",
+                "tst": "8085"
+        },
+        "data_path": "/data/shared/bioxpress/",
+        "dbinfo": {
+                "dbname": "bioxpress_api",
+                "port": {
+                        "prd": "",
+                        "tst": "8086"
+                },
+                "bridge_network": "bioxpress_api_backend_network",
+                "admin": {
+                        "password": "superpass"
+                },
+                "bioxpress_api": {
+                        "user": "bioxpressadmin",
+                        "password": "bioxpresspass"
+                }
+        },
+        "tmppath": "/tmp/",
+        "queries": {
+                "query_1": "SELECT DISTINCT A.featureId,A.featureName,A.featureType FROM biox_feature A, biox_xref B, biox_level C WHERE A.featureId = B.featureId AND A.featureId = C.featureId AND ( lower(A.featureName) LIKE '%QVALUE%' OR lower(B.xrefId) LIKE '%QVALUE%') AND B.xrefId != '-'",
+                "query_11": "SELECT xrefSrc, xrefId FROM biox_xref WHERE featureId = 'QVALUE'",
+                "query_12": "SELECT doName from biox_cancer where id != 1 AND id IN (SELECT cancerId from biox_level where featureId = QVALUE and lower(sigFlag) = 'yes' AND lower(deDirection) = 'up')",
+                "query_13": "SELECT doName from biox_cancer where id != 1 AND id IN (SELECT cancerId from biox_level where featureId = QVALUE and lower(sigFlag) = 'yes' AND lower(deDirection) = 'down')",
+                "query_14": "SELECT featureId, featureType, featureName FROM biox_feature WHERE featureId IN (SELECT DISTINCT featureId FROM biox_xref WHERE lower(xrefId) = 'QVALUE' AND xrefSrc IN ('UniProtKB', 'hgnc'))",
+                "query_15": "SELECT xrefSrc, xrefId FROM biox_xref WHERE featureId IN (SELECT DISTINCT featureId FROM biox_feature WHERE featureName =  'QVALUE')",
+                "query_2old": "SELECT C.doName,B.subjectsRatio,B.countOne, B.logFC,B.pValue,B.adjPValue,B.sigFlag,B.deDirection FROM biox_level B,  biox_cancer C WHERE B.cancerId = C.id AND C.id != 1 AND B.featureId IN (SELECT DISTINCT featureId FROM biox_xref WHERE lower(xrefId) = 'QVALUE' AND xrefSrc IN ('UniProtKB', 'hgnc')) AND B.pValue != 'NA' AND B.adjPValue != 'NA'",
+                "query_2": "SELECT C.sampleSynonym,B.subjectsRatio,B.countOne, B.logFC,B.pValue,B.adjPValue,B.sigFlag,B.deDirection FROM biox_level B,  biox_sample C WHERE B.sampleId = C.sampleId AND B.featureId IN (SELECT DISTINCT featureId FROM biox_xref WHERE lower(xrefId) = 'QVALUE' AND xrefSrc IN ('UniProtKB', 'hgnc')) AND B.pValue != 'NA' AND B.adjPValue != 'NA'",
+                "query_21": "SELECT B.doName,  A.min,A.firstQuantile,A.secondQuantile,A.thirdQuantile,A.max FROM biox_boxplot A, biox_cancer B WHERE A.cancerId = B.id AND B.id != 1 AND A.boxplotType = 'HISEQ' AND  A.featureId IN (SELECT DISTINCT featureId FROM biox_xref WHERE lower(xrefId) = 'QVALUE' AND xrefSrc = 'UniProtKB');",
+                "query_22": "select A.value from biox_dataset_stringvalues A, biox_dataset_records B where A.recordId = B.id AND A.fieldId in (16, 44, 58) AND B.mainId = 'QVALUE'",
+                "query_23": "SELECT B.doName,  A.min,A.firstQuantile,A.secondQuantile,A.thirdQuantile,A.max FROM biox_boxplot A, biox_cancer B WHERE A.cancerId = B.id AND B.id != 1 AND A.boxplotType = 'HISEQ' AND  A.featureId IN (SELECT DISTINCT featureId FROM biox_xref WHERE lower(xrefId) = 'QVALUE' AND xrefSrc = 'hgnc');",
+                "query_31": "SELECT A.featureName,B.subjectsRatio,B.countOne,B.logFC,B.pValue,B.adjPValue,B.sigFlag,B.deDirection,B.pmid FROM biox_feature A, biox_level B WHERE A.featureId = B.featureId AND B.cancerId = QVALUE1 AND A.featureType = 'QVALUE2' AND B.deDirection = 'QVALUE3' AND CAST(B.adjPValue AS decimal(9,4)) < QVALUE4 AND NOT B.adjPValue ='NA'",
+                "query_32": "SELECT A.featureName,B.subjectsRatio,B.countOne,B.logFC,B.pValue,B.adjPValue,B.sigFlag,B.deDirection,B.pmid FROM biox_feature A, biox_level B WHERE A.featureId = B.featureId AND B.cancerId = QVALUE1 AND A.featureType = 'QVALUE2' AND CAST(B.adjPValue AS decimal(9,4)) < QVALUE4 AND NOT B.adjPValue ='NA'",
+                "query_33": "SELECT A.featureName,B.subjectsRatio,B.countOne,B.logFC,B.pValue,B.adjPValue,B.sigFlag,B.deDirection,B.pmid FROM biox_feature A, biox_level B WHERE A.featureId = B.featureId AND B.cancerId = QVALUE1 AND A.featureType = 'QVALUE2' AND B.deDirection = 'QVALUE3' AND CAST(B.adjPValue AS decimal(9,4)) < QVALUE4 AND ABS(CAST(B.logFC AS decimal(9,4))) > QVALUE5 AND B.adjPValue != 'NA' AND B.logFC != 'NA'",
+                "query_4": "SELECT id, name,type from biox_dataset_fields where datasetId = QVALUE ",
+                "query_41": "SELECT recordId, fieldId, value from biox_dataset_stringvalues where recordId in (select id from biox_dataset_records where datasetId = QVALUE1 AND mainId = 'QVALUE2' )",
+                "query_42": "SELECT recordId, fieldId, value from biox_dataset_numericvalues where recordId in (select id from biox_dataset_records where datasetId = QVALUE1 AND mainId = 'QVALUE2' )"
+        },
+        "queryform": {
+                "boxlist": [
+                        [
+                                {
+                                        "name": "searchtype",
+                                        "id": "searchtype",
+                                        "class": "searchelementcls",
+                                        "onchange": "changeIdSelector();",
+                                        "selected": "transcriptsearch",
+                                        "type": "select",
+                                        "options": {
+                                                "transcriptsearch": "Search by transcript",
+                                                "doslimsearch": "Search by cancer type"
+                                        },
+                                        "style": "width:100%;height:30px;padding:3;border:1px solid #fff;font-size:12px;",
+                                        "containerwidth": "35%",
+                                        "boxlabel": "Select search type"
+                                },
+                                {
+                                        "name": "searchvalue1",
+                                        "id": "searchvalue1",
+                                        "class": "searchelementcls",
+                                        "value": "KRAS",
+                                        "type": "text",
+                                        "style": "width:100%;height:30px;padding:3;border:1px solid #fff;font-size:12px;",
+                                        "containerwidth": "50%",
+                                        "boxlabel": "For example: KRAS, P01116, NP_203524, hsa-mir-21 "
+                                },
+                                {
+                                        "name": "searchbtn",
+                                        "class": "searchbtncls",
+                                        "value": " Search ",
+                                        "id": "transcriptSearch",
+                                        "type": "submit",
+                                        "readonly": false,
+                                        "style": "width:100%;height:30px;",
+                                        "containerwidth": "100%"
+                                }
+                        ],
+                        [
+                                {
+                                        "name": "searchtype",
+                                        "id": "searchtype",
+                                        "class": "searchelementcls",
+                                        "onchange": "changeIdSelector();",
+                                        "type": "select",
+                                        "options": {
+                                                "transcriptsearch": "Search by transcript",
+                                                "doslimsearch": "Search by cancer type"
+                                        },
+                                        "style": "width:100%;height:30px;padding:3;border:1px solid #fff;font-size:12px;",
+                                        "containerwidth": "25%",
+                                        "boxlabel": "Select search type"
+                                },
+                                {
+                                        "name": "cancerid",
+                                        "class": "searchelementcls",
+                                        "onchange": "",
+                                        "type": "select",
+                                        "options": {},
+                                        "style": "width:100%;height:30px;padding:3;border:1px solid #fff;font-size:12px;",
+                                        "containerwidth": "30%",
+                                        "boxlabel": "Select cancer type"
+                                },
+                                {
+                                        "name": "featuretype",
+                                        "class": "searchelementcls",
+                                        "type": "select",
+                                        "selected": "mrna",
+                                        "options": {
+                                                "mrna": "mRNA",
+                                                "mirna": "miRNA"
+                                        },
+                                        "style": "width:100%;height:30px;padding:3;border:1px solid #fff;font-size:12px;",
+                                        "containerwidth": "10%",
+                                        "boxlabel": "Feature type"
+                                },
+                                {
+                                        "name": "dedirection",
+                                        "class": "searchelementcls",
+                                        "type": "select",
+                                        "options": {
+                                                "up": "Up",
+                                                "down": "Down",
+                                                "both": "Both"
+                                        },
+                                        "style": "width:100%;height:30px;padding:3;border:1px solid #fff;font-size:12px;",
+                                        "containerwidth": "10%",
+                                        "boxlabel": "Trend"
+                                },
+                                {
+                                        "name": "cutoff",
+                                        "class": "searchelementcls",
+                                        "type": "select",
+                                        "options": {
+                                                "0.1": "adj_p_value<0.1",
+                                                "0.05": "adj_p_value<0.05",
+                                                "0.01": "adj_p_value<0.01",
+                                                "0.001": "adj_p_value<0.001",
+                                                "0.05|1": "adj_p_value<0.05 & |log2FC| > 1",
+                                                "manual": "Manual Curation"
+                                        },
+                                        "style": "width:100%;height:30px;padding:3;border:1px solid #fff;font-size:12px;",
+                                        "containerwidth": "24%",
+                                        "boxlabel": "Significance cutoff"
+                                },
+                                {
+                                        "name": "searchbtn",
+                                        "class": "searchbtncls",
+                                        "value": " Search ",
+                                        "id": "cancerSearch",
+                                        "type": "submit",
+                                        "readonly": false,
+                                        "style": "width:100%;height:30px;",
+                                        "containerwidth": "100%"
+                                }
+                        ]
+                ],
+                "advanced": false
+        },
+        "tableheaders": {
+                "transcriptsearchresults": {
+                        "labellist": [
+                                "Primary Feature ID",
+                                "Symbol",
+                                "Feature Type",
+                                "Other Identifiers",
+                                "Over-expressed In",
+                                "Under-expressed In"
+                        ],
+                        "typelist": [
+                                "string",
+                                "string",
+                                "string",
+                                "string",
+                                "string",
+                                "string"
+                        ]
+                },
+                "transcriptview": {
+                        "labellist": [
+                                "Cancer Type",
+                                "Subjects Ratio",
+                                "Raw Count",
+                                "log2FC",
+                                "P-Value",
+                                "Adjusted P-Value",
+                                "Significance",
+                                "Expression Trend"
+                        ],
+                        "typelist": [
+                                "string",
+                                "string",
+                                "number",
+                                "number",
+                                "number",
+                                "number",
+                                "string",
+                                "string"
+                        ]
+                },
+                "bgee": {
+                        "labellist": [
+                                "A",
+                                "B"
+                        ],
+                        "typelist": [
+                                "string",
+                                "string"
+                        ]
+                },
+                "textmine": {
+                        "labellist": [
+                                "A",
+                                "B"
+                        ],
+                        "typelist": [
+                                "string",
+                                "string"
+                        ]
+                },
+                "cancerview": {
+                        "labellist": [
+                                "Primary Feature ID",
+                                "Feature Name",
+                                "Subjects Ratio",
+                                "Raw Count",
+                                "log2FC",
+                                "P-Value",
+                                "Adjusted P-Value",
+                                "Significance",
+                                "Expression Trend",
+                                "PMID List"
+                        ],
+                        "typelist": [
+                                "string",
+                                "string",
+                                "string",
+                                "number",
+                                "number",
+                                "number",
+                                "number",
+                                "string",
+                                "string",
+                                "string"
+                        ]
+                }
+        }
+}
