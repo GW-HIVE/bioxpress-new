@@ -6,3 +6,7 @@ old/
 logging/*
 __pycache__/
 sql-dump/
+.pytest_cache/
+dist/
+build/
+*egg-info/
