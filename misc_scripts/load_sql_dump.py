@@ -33,11 +33,11 @@ def load_sql_dump(cursor: Cursor, dump_file: str) -> None:
     """
     LOGGER.info(f"Loading SQL dump from file: {dump_file}.")
     command = (
-        f"mysql -u {cursor.connection.user.decode('utf-8')} "
-        f"-p {cursor.connection.password.decode('utf-8')} "
-        f"-h {cursor.connection.host.decode('utf-8')} "
-        f"-P {cursor.connection.port.decode('utf-8')} "
-        f"{cursor.connection.db.decode('utf-8')} < {dump_file}"
+        f"mysql -u {cursor.connection.user} "
+        f"-p {cursor.connection.password} "
+        f"-h {cursor.connection.host} "
+        f"-P {cursor.connection.port} "
+        f"{cursor.connection.db} < {dump_file}"
     )
     LOGGER.debug(f"command: {command}")
 
