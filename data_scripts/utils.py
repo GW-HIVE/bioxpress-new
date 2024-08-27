@@ -108,7 +108,7 @@ def setup_logger(script: str, category: Literal["load_scripts"]) -> Logger:
 
     console_handler = logging.StreamHandler()
     file_handler = logging.FileHandler(
-        os.path.join(CURRENT_DIR, category, f"{script}.log")
+        os.path.join(CURRENT_DIR, "logging", category, f"{script}.log")
     )
 
     formatter = logging.Formatter(
