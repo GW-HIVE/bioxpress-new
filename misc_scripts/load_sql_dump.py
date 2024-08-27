@@ -34,7 +34,7 @@ def load_sql_dump(cursor: Cursor, dump_file: str) -> None:
     LOGGER.info(f"Loading SQL dump from file: {dump_file}.")
     command = (
         f"mysql -u {cursor.connection.user} "
-        f"-p {cursor.connection.password} "
+        f"-p{cursor.connection.password} "
         f"-h {cursor.connection.host} "
         f"-P {cursor.connection.port} "
         f"{cursor.connection.db} < {dump_file}"
