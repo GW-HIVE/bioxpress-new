@@ -6,7 +6,11 @@ import sys
 import argparse
 from argparse import ArgumentParser
 import traceback
-from csv import DictReader
+from logging import Logger
+import logging
+import os
+
+CURRENT_DIR = os.path.dirname(__file__)
 
 
 def get_config_json() -> dict:
@@ -74,3 +78,36 @@ def validate_server_arg(server: str) -> bool:
     if server in {"tst", "prd"}:
         return True
     return False
+
+
+def setup_logger(script: str) -> Logger:
+    """Sets up a logger for a specific script.
+
+    Parameters
+    ----------
+    script : str
+        The name of the script using the logger, used to generate the log file name.
+
+    Returns
+    -------
+    Logger
+        Configured logger instance.
+    """
+    logger = logging.getLogger(script)
+    logger.setLevel(logging.DEBUG)
+
+    console_handler = logging.StreamHandler()
+    file_handler = logging.FileHandler(
+        os.path.join(CURRENT_DIR, "logging", f"{script}.log")
+    )
+
+    formatter = logging.Formatter(
+        "%(asctime)s - %(levelname)s - %(message)s", "%Y-%m-%d %H:%M:%S"
+    )
+    console_handler.setFormatter(formatter)
+    file_handler.setFormatter(formatter)
+
+    logger.addHandler(console_handler)
+    logger.addHandler(file_handler)
+
+    return logger
