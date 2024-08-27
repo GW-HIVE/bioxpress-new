@@ -5,6 +5,7 @@ import json
 import sys
 import argparse
 from argparse import ArgumentParser
+import traceback
 
 
 def get_config_json() -> dict:
@@ -26,7 +27,7 @@ def get_db_cursor(server: Literal["tst", "prd"]) -> Cursor:
     config_json = get_config_json()
     host = "127.0.0.1"
     db_name = config_json["dbinfo"]["dbname"]
-    port = config_json["dbinfo"]["port"][server]
+    port = int(config_json["dbinfo"]["port"][server])
     username = config_json["dbinfo"][db_name]["user"]
     password = config_json["dbinfo"][db_name]["password"]
 
@@ -35,7 +36,7 @@ def get_db_cursor(server: Literal["tst", "prd"]) -> Cursor:
             host=host, port=port, user=username, password=password, database=db_name
         )
     except Exception as e:
-        graceful_exit(exit_code=1, error_msg=str(e))
+        graceful_exit(exit_code=1, error_msg=f"{traceback.format_exc()}\n{e}")
 
     return connection.cursor()
 
