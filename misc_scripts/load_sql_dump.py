@@ -44,22 +44,8 @@ def load_sql_dump(
     LOGGER.debug(f"command: {command}")
 
     try:
-        result = subprocess.run(
-            command,
-            shell=True,
-            check=True,
-            stderr=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-        )
-
-        if result.returncode == 0:
-            LOGGER.info("SQL dump loaded successfully.")
-        else:
-            LOGGER.error(f"Error loading SQL dump: {result.stderr.decode('utf-8')}")
-
-    except subprocess.CalledProcessError as e:
-        LOGGER.error(f"Subprocess error: {e}")
-        LOGGER.error(traceback.format_exc())
+        output = subprocess.getoutput(command)
+        LOGGER.debug(output)
 
     except Exception as e:
         LOGGER.error(f"Subprocess error: {e}")
