@@ -1,86 +1,66 @@
-import os,sys
-import MySQLdb
-import string
-import commands
-from optparse import OptionParser
-import glob
-import json
+from data_scripts import utils
+import traceback
+from pathlib import Path
+
+IN_FILE = "../../data/bioxpress-final.xref.csv"
+LOGGER = utils.setup_logger(Path(__file__).stem, "load_scripts")
 
 
-sys.path.append('../lib/')
-import csvutil
+def main() -> None:
 
+    parser = utils.default_argparse("new_load_feature.py")
+    options = parser.parse_args()
 
+    if not utils.validate_server_arg(options.server):
+        utils.graceful_exit(
+            exit_code=1,
+            error_msg=f"Invalid server `{options.server}` provided.",
+            logger=LOGGER,
+        )
 
-__version__="1.0"
-__status__ = "Dev"
+    cursor = utils.get_db_cursor(options.server)
+    dict_reader, file_handle = utils.get_csv_reader(IN_FILE)
 
-
-
-
-###############################
-def main():
-
-    config_string = open("conf/config.json", "r").read()
-    config_obj = json.loads(config_string)
-    db_obj = config_obj["dbinfo"]
-
-    dbh = MySQLdb.connect(
-        host = db_obj["host"], 
-        user = db_obj["userid"],
-        passwd = db_obj["password"],
-        db = db_obj["dbname"]
-    )
-
-
-    in_file = "generated/bioxpress-final.xref.csv"
-    #in_file = "tmp/toy.csv"
-
-    cur = dbh.cursor()
     try:
-        
-        #First empty the table
-        sql = "delete from biox_feature"
-        cur.execute(sql)
-        
-        #Reset auto increment
-        sql = "ALTER TABLE biox_feature AUTO_INCREMENT = 1"
-        cur.execute(sql)
-        dbh.commit()
-        
-        data_frame = {}
-        sep = "\",\""
-        fields = config_obj["datasetinfo"][in_file]["string"]
+        # Clear the table and reset auto-increment
+        cursor.execute("DELETE FROM biox_feature")
+        cursor.execute("ALTER TABLE biox_feature AUTO_INCREMENT = 1")
 
-        csvutil.load_large_sheet(data_frame, in_file, fields, sep)
-        
-        seen = {}
-        f_list = data_frame["fields"]
+        seen = set()
         load_count = 0
-        for row in data_frame["data"]:
-            gene_name = row[f_list.index("gene_name")]
-            xref_db = row[f_list.index("xref_db")]
-            xref_id = row[f_list.index("xref_id")]
+        for idx, row in enumerate(dict_reader):
+            gene_name = row.get("gene_name")
+
+            # TODO : retaining original logic, even though these are not used
+            xref_db = row.get("xref_db")
+            xref_id = row.get("xref_id")
+
+            if not gene_name:
+                utils.graceful_exit(
+                    exit_code=1,
+                    error_msg=f"Missing gene_name on row `{idx}`.",
+                    logger=LOGGER,
+                )
+
             if gene_name not in seen:
-                sql = "INSERT INTO biox_feature (featureName, featureType) VALUES " 
+                sql = "INSERT INTO biox_feature (featureName, featureType) VALUES "
                 sql += "('%s','%s')" % (gene_name, "mrna")
-                cur.execute(sql)
+                cursor.execute(sql)
                 load_count += 1
-                print "%s, %s"  % (load_count, sql)
-                seen[gene_name] = True
-        dbh.commit()
-        print "Finshed loading %s rows" % (load_count)
+                LOGGER.info(f"{load_count}, {sql}")
+                seen.add(gene_name)
 
-    except:
-        print "there was some problem with the sqls"
-        dbh.rollback()
-    
-    dbh.close()
+        cursor.connection.commit()
+        LOGGER.info(f"Finished loading {load_count} rows.")
 
+    except Exception as e:
+        LOGGER.error(f"An error occurred: {e}")
+        LOGGER.error(traceback.format_exc())
+        cursor.connection.rollback()
 
-
-
-if __name__ == '__main__':
-	main()
+    finally:
+        utils.finish(cursor, file_handle)
 
 
+if __name__ == "__main__":
+    main()
