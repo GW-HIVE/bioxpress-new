@@ -5,10 +5,9 @@ from bioxpress.services.cancer_service import search_cancer, get_cancer_list
 api_bp = Blueprint("api", __name__)
 
 
-@api_bp.route("/getStats", methods=["POST"])
+@api_bp.route("/getStats", methods=["GET"])
 def stats():
-    json_data = request.get_json()
-    result = get_stats(json_data)
+    result = get_stats()
     return jsonify(result)
 
 
