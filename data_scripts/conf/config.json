@@ -1,71 +1,146 @@
 {
-    "dbinfo":{
-        "host":"localhost", "dbname":"bioxpress_prd",
-        "userid":"bioxpressadmin", "password":"bioxpresspass"
-    }
-    ,"datasetinfo":{
-        "generated/bioxpress-final.xref.csv":{
-            "string":["gene_name","xref_db","xref_id"]
-            ,"numeric":[]
-        }
-        ,"generated/bioxpress-final.domap.csv":{
-            "string":[
-                "study_id","do_id","do_name","uberon_id","uberon_name"
-            ]
-            ,"numeric":[]
-        }
-        ,"generated/bioxpress-final.de.csv":{
-            "string":[
-                "uniprot_ac","refseq_ac","gene_name","log2fc","pvalue","adjpvalue","significance","direction","subjects_up","subjects_down","subjects_nochange","subjects_total","data_source","study_id","pmid","doid","doname","uberon_id"        
-            ]
-            ,"numeric":[]
-        }
-        ,"downloads/bgee/oncoMX_expression_9606.tsv":{
-            "string":[
-                "uniprotAC","anatEntityID","devStageID","sex","Pres/Abs"
-            ]
-            ,"numeric":["score"]
-        }
-        ,"downloads/bgee/oncoMX_expression_10090.tsv":{
-            "string":[
-                "uniprotAC","anatEntityID","devStageID","sex","Pres/Abs"
-            ]
-            ,"numeric":["score"]
-        }
-        ,"downloads/dexter/glycosyltransferase_textMining_tissue.txt":{
-            "string":[
-                "uniProtID","geneID","geneMen","PMID","DOID",    
-                "DOID_Name","DiseaseMention","DiseaseDetectedFrom","ExpressionLevel",
-                "SentenceType","Sample1","Sample2","isSamePatient","Sentence"
-            ]
-            ,"numeric":[]
-        }
-        ,"downloads/dexter/lung_cancer_all_tissue.txt":{
-            "string":[
-                "uniProtID","entrezID","geneMen","PMID","DOID",
-                "DOID_Name","DiseaseMention","DiseaseDetectedFrom","ExpressionLevel",
-                "SentenceType","Sample1","Sample2","isSamePatient","Sentence"
-            ]
-            ,"numeric":[]
-        }
-        ,"downloads/dexter/microRNA_textMining_tissue.txt":{
-            "string":[
-                "mirNum","mirMen","PMID","DOID","DOID_Name","DiseaseMention",
-                "DiseaseDetectedFrom","ExpressionLevel",
-                "SentenceType","Sample1","Sample2","isSamePatient","Sentence"
-            ]
-            ,"numeric":[]
-        }
-    }
-    ,"queries":{
-		"q_11":"select count(distinct featureId) from biox_level where featureId in (select featureId from biox_feature WHERE featureType = 'mrna')"
-
-		,"q_12":"select count(distinct featureId) from biox_level where lower(sigFlag) = 'yes' and featureId in (select featureId from biox_feature WHERE featureType = 'mrna')"
-		
-		,"q_21": "select count(distinct featureId) from biox_level where featureId in (select featureId from biox_feature WHERE featureType = 'mirna');"
-
-		,"q_22": "select count(distinct featureId) from biox_level where lower(sigFlag) = 'yes' and featureId in (select featureId from biox_feature WHERE featureType = 'mirna');"
-		
-		,"q_41":"select count(distinct doId) from biox_cancer where doId != '-'"
-	}
+   "dbinfo": {
+      "dbname": "bioxpress_api",
+      "port": {
+         "prd": "",
+         "tst": "8086"
+      },
+      "admin": {
+         "password": "superpass"
+      },
+      "bioxpress_api": {
+         "user": "bioxpressadmin",
+         "password": "bioxpresspass"
+      }
+   },
+   "datasetinfo": {
+      "generated/bioxpress-final.xref.csv": {
+         "string": [
+            "gene_name",
+            "xref_db",
+            "xref_id"
+         ],
+         "numeric": []
+      },
+      "generated/bioxpress-final.domap.csv": {
+         "string": [
+            "study_id",
+            "do_id",
+            "do_name",
+            "uberon_id",
+            "uberon_name"
+         ],
+         "numeric": []
+      },
+      "generated/bioxpress-final.de.csv": {
+         "string": [
+            "uniprot_ac",
+            "refseq_ac",
+            "gene_name",
+            "log2fc",
+            "pvalue",
+            "adjpvalue",
+            "significance",
+            "direction",
+            "subjects_up",
+            "subjects_down",
+            "subjects_nochange",
+            "subjects_total",
+            "data_source",
+            "study_id",
+            "pmid",
+            "doid",
+            "doname",
+            "uberon_id"
+         ],
+         "numeric": []
+      },
+      "downloads/bgee/oncoMX_expression_9606.tsv": {
+         "string": [
+            "uniprotAC",
+            "anatEntityID",
+            "devStageID",
+            "sex",
+            "Pres/Abs"
+         ],
+         "numeric": [
+            "score"
+         ]
+      },
+      "downloads/bgee/oncoMX_expression_10090.tsv": {
+         "string": [
+            "uniprotAC",
+            "anatEntityID",
+            "devStageID",
+            "sex",
+            "Pres/Abs"
+         ],
+         "numeric": [
+            "score"
+         ]
+      },
+      "downloads/dexter/glycosyltransferase_textMining_tissue.txt": {
+         "string": [
+            "uniProtID",
+            "geneID",
+            "geneMen",
+            "PMID",
+            "DOID",
+            "DOID_Name",
+            "DiseaseMention",
+            "DiseaseDetectedFrom",
+            "ExpressionLevel",
+            "SentenceType",
+            "Sample1",
+            "Sample2",
+            "isSamePatient",
+            "Sentence"
+         ],
+         "numeric": []
+      },
+      "downloads/dexter/lung_cancer_all_tissue.txt": {
+         "string": [
+            "uniProtID",
+            "entrezID",
+            "geneMen",
+            "PMID",
+            "DOID",
+            "DOID_Name",
+            "DiseaseMention",
+            "DiseaseDetectedFrom",
+            "ExpressionLevel",
+            "SentenceType",
+            "Sample1",
+            "Sample2",
+            "isSamePatient",
+            "Sentence"
+         ],
+         "numeric": []
+      },
+      "downloads/dexter/microRNA_textMining_tissue.txt": {
+         "string": [
+            "mirNum",
+            "mirMen",
+            "PMID",
+            "DOID",
+            "DOID_Name",
+            "DiseaseMention",
+            "DiseaseDetectedFrom",
+            "ExpressionLevel",
+            "SentenceType",
+            "Sample1",
+            "Sample2",
+            "isSamePatient",
+            "Sentence"
+         ],
+         "numeric": []
+      }
+   },
+   "queries": {
+      "q_11": "select count(distinct featureId) from biox_level where featureId in (select featureId from biox_feature WHERE featureType = 'mrna')",
+      "q_12": "select count(distinct featureId) from biox_level where lower(sigFlag) = 'yes' and featureId in (select featureId from biox_feature WHERE featureType = 'mrna')",
+      "q_21": "select count(distinct featureId) from biox_level where featureId in (select featureId from biox_feature WHERE featureType = 'mirna');",
+      "q_22": "select count(distinct featureId) from biox_level where lower(sigFlag) = 'yes' and featureId in (select featureId from biox_feature WHERE featureType = 'mirna');",
+      "q_41": "select count(distinct doId) from biox_cancer where doId != '-'"
+   }
 }
