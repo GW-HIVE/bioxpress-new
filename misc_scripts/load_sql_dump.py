@@ -32,7 +32,14 @@ def load_sql_dump(cursor: Cursor, dump_file: str) -> None:
         The path to the SQL dump file to be loaded.
     """
     LOGGER.info(f"Loading SQL dump from file: {dump_file}.")
-    command = f"mysql -u {cursor.connection.user} -p {cursor.connection.password} -h {cursor.connection.host} -P {cursor.connection.port} {cursor.connection.db} < {dump_file}"
+    command = (
+        f"mysql -u {cursor.connection.user.decode('utf-8')} "
+        f"-p {cursor.connection.password.decode('utf-8')} "
+        f"-h {cursor.connection.host.decode('utf-8')} "
+        f"-P {cursor.connection.port.decode('utf-8')} "
+        f"{cursor.connection.db.decode('utf-8')} < {dump_file}"
+    )
+    LOGGER.debug(f"command: {command}")
 
     try:
         result = subprocess.run(
