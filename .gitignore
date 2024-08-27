@@ -2,3 +2,5 @@ env/
 .env
 **/archive/
 data/
+old/
+logging/*
