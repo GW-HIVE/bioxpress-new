@@ -3,7 +3,7 @@ env/
 **/archive/
 data/
 old/
-logging/*
+**/logging/*
 __pycache__/
 sql-dump/
 .pytest_cache/
