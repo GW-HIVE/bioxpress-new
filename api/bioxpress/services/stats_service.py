@@ -12,7 +12,7 @@ def get_stats() -> dict:
 
     try:
         # Query to fetch titles from biox_stat
-        query = text("SELECT id, title FROM biox_stat")
+        query = text("SELECT * FROM biox_stat")
         result = db.session.execute(query)
 
         if result:
