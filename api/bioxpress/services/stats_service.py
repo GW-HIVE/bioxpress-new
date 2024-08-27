@@ -21,22 +21,20 @@ def get_stats(in_json: dict) -> dict:
         # Query to fetch the specific stat data
         stat_id = in_json.get("statid")
         if not stat_id:
-            raise ValueError("Missing 'statid' in input JSON")
+            outJson["taskstatus"] = 0
+            outJson["errormsg"] = "Missing 'statid' in input JSON"
 
         stat_query = text("SELECT jsonstring FROM biox_stat WHERE id = :stat_id")
         stat_result = db.session.execute(stat_query, {"stat_id": stat_id}).fetchone()
 
         if stat_result:
             obj = json.loads(stat_result.jsonstring)
-            outJson["pageconf"] = app.config["PAGECONF"]["about"]
-            outJson["dataframe"] = [obj["fieldnames"], obj["fieldtypes"]] + obj["dataframe"]
+            outJson["dataframe"] = [obj["fieldnames"], obj["fieldtypes"]] + obj[
+                "dataframe"
+            ]
         else:
-            raise ValueError(f"No stats found for id {stat_id}")
-
-    except IOError as e:
-        app.logger.error(f"I/O error: {e}")
-        outJson["taskstatus"] = 0
-        outJson["errormsg"] = f"I/O error: {str(e)}"
+            outJson["taskstatus"] = 0
+            outJson["errormsg"] = f"No stats found for id {stat_id}"
 
     except ValueError as e:
         app.logger.error(f"ValueError: {e}")
@@ -54,4 +52,3 @@ def get_stats(in_json: dict) -> dict:
         outJson["errormsg"] = f"Unexpected error: {str(e)}"
 
     return outJson
-
