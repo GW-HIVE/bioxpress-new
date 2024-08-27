@@ -6,6 +6,7 @@ import sys
 import argparse
 from argparse import ArgumentParser
 import traceback
+from csv import DictReader
 
 
 def get_config_json() -> dict:
