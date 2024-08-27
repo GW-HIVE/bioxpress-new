@@ -2,7 +2,7 @@ import json
 from flask import current_app as app
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import text
-from bioxpress import db
+from bioxpress.db import db
 from typing import Any
 
 

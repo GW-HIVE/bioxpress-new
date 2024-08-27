@@ -4,7 +4,7 @@ import datetime
 import time
 from flask import current_app as app
 from sqlalchemy import text
-from bioxpress import db
+from bioxpress.db import db
 import traceback
 
 
