@@ -1,10 +1,10 @@
 from pathlib import Path
+from typing import Literal
 from utils import (
-    get_db_cursor,
+    get_config_json,
     graceful_exit,
     default_argparse,
     validate_server_arg,
-    close_connection,
     setup_logger,
 )
 import traceback
@@ -17,27 +17,29 @@ IN_FILE = "../sql_dump/bioxpress_prd.dump.sql"
 LOGGER = setup_logger(Path(__file__).stem)
 
 
-def load_sql_dump(cursor: Cursor, dump_file: str) -> None:
+def load_sql_dump(
+    config_json: dict, server: Literal["tst", "prd"], dump_file: str
+) -> None:
     """Loads an SQL dump file into the connected MySQL database.
 
     This function uses a subprocess to execute the MySQL command that imports
     the SQL dump file into the database. It logs the process and any errors
     encountered during execution.
-
-    Parameters
-    ----------
-    cursor : pymysql.cursors.Cursor
-        A cursor connected to the target MySQL database.
-    dump_file : str
-        The path to the SQL dump file to be loaded.
     """
     LOGGER.info(f"Loading SQL dump from file: {dump_file}.")
+
+    host = "127.0.0.1"
+    db_name = config_json["dbinfo"]["dbname"]
+    port = int(config_json["dbinfo"]["port"][server])
+    username = config_json["dbinfo"][db_name]["user"]
+    password = config_json["dbinfo"][db_name]["password"]
+
     command = (
-        f"mysql -u {cursor.connection.user} "
-        f"-p{cursor.connection.password} "
-        f"-h {cursor.connection.host} "
-        f"-P {cursor.connection.port} "
-        f"{cursor.connection.db} < {dump_file}"
+        f"mysql -u {username} "
+        f"-p{password} "
+        f"-h {host} "
+        f"-P {port} "
+        f"{db_name} < {dump_file}"
     )
     LOGGER.debug(f"command: {command}")
 
@@ -58,12 +60,10 @@ def load_sql_dump(cursor: Cursor, dump_file: str) -> None:
     except subprocess.CalledProcessError as e:
         LOGGER.error(f"Subprocess error: {e}")
         LOGGER.error(traceback.format_exc())
-        cursor.connection.rollback()
 
     except Exception as e:
         LOGGER.error(f"Subprocess error: {e}")
         LOGGER.error(traceback.format_exc())
-        cursor.connection.rollback()
 
 
 def main() -> None:
@@ -75,18 +75,9 @@ def main() -> None:
             exit_code=1, error_msg=f"Invalid server `{options.server}` provided."
         )
 
-    cursor = get_db_cursor(options.server)
+    config_json = get_config_json()
 
-    try:
-        load_sql_dump(cursor, IN_FILE)
-
-    except Exception as e:
-        LOGGER.error(f"An error occurred: {e}")
-        LOGGER.error(traceback.format_exc())
-        cursor.connection.rollback()
-
-    finally:
-        close_connection(cursor)
+    load_sql_dump(config_json, options.server, IN_FILE)
 
 
 if __name__ == "__main__":
