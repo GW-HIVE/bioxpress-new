@@ -1,5 +1,4 @@
 import pymysql
-from pymysql.connections import Connection
 from pymysql.cursors import Cursor
 from typing import Literal, Optional, NoReturn
 import json
@@ -22,7 +21,7 @@ def get_config_json() -> dict:
     return return_data
 
 
-def get_db_connection(server: Literal["tst", "prd"]) -> Connection[Cursor]:
+def get_db_cursor(server: Literal["tst", "prd"]) -> Cursor:
 
     config_json = get_config_json()
     host = "127.0.0.1"
@@ -38,11 +37,10 @@ def get_db_connection(server: Literal["tst", "prd"]) -> Connection[Cursor]:
     except Exception as e:
         graceful_exit(exit_code=1, error_msg=str(e))
 
-    return connection
+    return connection.cursor()
 
 
-def close_connections(connection: Connection, cursor: Cursor) -> None:
-    connection.close()
+def close_connection(cursor: Cursor) -> None:
     cursor.close()
 
 

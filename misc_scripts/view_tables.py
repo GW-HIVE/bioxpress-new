@@ -1,9 +1,9 @@
 from utils import (
-    get_db_connection,
+    get_db_cursor,
     graceful_exit,
     default_argparse,
     validate_server_arg,
-    close_connections,
+    close_connection,
 )
 
 
@@ -16,8 +16,7 @@ def main():
             exit_code=1, error_msg=f"Invalid server `{options.server}` provided."
         )
 
-    connection = get_db_connection(options.server)
-    cursor = connection.cursor()
+    cursor = get_db_cursor(options.server)
 
     cursor.execute("SHOW TABLES")
     tables = cursor.fetchall()
@@ -28,9 +27,14 @@ def main():
 
     print("Tables in the database:")
     for table in tables:
-        print(table[0])
+        cursor.execute(f"SELECT COUNT(*) FROM {table[0]}")
+        row_count = cursor.fetchone()
+        row_count = (
+            row_count[0] if row_count is not None else "error grabbing row count"
+        )
+        print(f"\t- {table[0]}; row count: {row_count}")
 
-    close_connections(connection, cursor)
+    close_connection(cursor)
 
 
 if __name__ == "__main__":
