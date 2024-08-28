@@ -48,10 +48,8 @@ def get_data_set_table(config_json, field_value, dataset_id, exclude_field_list)
         if f in field_type["string"]:
             field_type["string"].pop(f)
 
-    sql = text(
-        config_json["queries"]["query_42"].params(
-            qvalue1=str(dataset_id), qvalue2=field_value
-        )
+    sql = text(config_json["queries"]["query_42"]).params(
+        qvalue1=str(dataset_id), qvalue2=field_value
     )
     cur = db.session.execute(sql)
 
