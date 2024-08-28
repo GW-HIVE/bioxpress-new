@@ -249,7 +249,8 @@
     }
   },
   "urls": {
-    "pubmedurl": "https://www.ncbi.nlm.nih.gov/pubmed/"
+    "pubmedurl": "https://www.ncbi.nlm.nih.gov/pubmed/",
+    "biomutaurl": "https://hivelab.biochemistry.gwu.edu/biomuta/proteinview/"
   },
   "pageconf": {
     "about": {
