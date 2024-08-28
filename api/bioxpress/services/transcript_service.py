@@ -4,6 +4,7 @@ import time
 from flask import current_app as app
 from sqlalchemy import text
 from bioxpress.db import db
+import math
 
 
 def dump_csv_file(data_frame, config_json, file_prefix):
@@ -182,13 +183,36 @@ def get_transcript_data(in_json: dict) -> dict:
 
         # Fetch feature information
         sql = text(config_json["queries"]["query_14"]).params(qvalue=field_value)
-        result = db.session.execute(sql).fetchone()
-        # feature_id, feature_type, feature_name = result[0], result[1], result[2]
+        result = db.session.execute(sql)
+        row = result.fetchone()
+        feature_id, feature_type, feature_name = row[0], row[1], row[2]  # type: ignore
 
         # Fetch expression table data
-        expression_table = []
         sql = text(config_json["queries"]["query_2"]).params(qvalue=field_value)
         cur = db.session.execute(sql)
+
+        labelList = config_json["tableheaders"]["transcriptview"]["labellist"]
+        typeList = config_json["tableheaders"]["transcriptview"]["typelist"]
+        expressionTable1 = [labelList, typeList]
+
+        plotData1: list = []
+        plotData2: list = []
+        plotData3: list = []
+        plotData1.append(
+            [
+                "null",
+                config_json["pageconf"]["transcriptview"]["plotylegend1_y1"],
+                config_json["pageconf"]["transcriptview"]["plotylegend1_y2"],
+            ]
+        )
+        plotData2.append(
+            [
+                "null",
+                config_json["pageconf"]["transcriptview"]["plotylegend2_y1"],
+                config_json["pageconf"]["transcriptview"]["plotylegend2_y2"],
+            ]
+        )
+        plotAnn2: list = []
 
         for row in cur.fetchall():
             cancer_name = row[0]
@@ -200,33 +224,107 @@ def get_transcript_data(in_json: dict) -> dict:
             for j in range(1, len(row)):
                 value = row[j] if isinstance(row[j], str) else float(row[j])
                 obj.append(value)
-            expression_table.append(obj)
+            if row[1].strip() != "-":
+
+                ratioN = round(float(row[1].split("(")[0].split("/")[0]), 2)  # )
+                ratioD = round(float(row[1].split("(")[0].split("/")[1]), 2)  # )
+
+                if ratioD < 10:
+                    continue
+
+                if row[-1].lower() == "up":
+                    plotData1.append([cancer_name, ratioN, ratioD - ratioN])
+                else:
+                    plotData1.append([cancer_name, ratioD - ratioN, ratioN])
+                y1 = round(float(ratioN * 100 / ratioD), 2)
+                y2 = round(float(float(row[2]) * 100 / ratioD), 2)
+                plotData2.append([cancer_name, y1, y2])
+                ann = "+" if row[-1].lower() == "up" else "-"
+                plotAnn2.append([ann, ann])
+                expressionTable1.append(obj)
+
+        sql = text(
+            config_json["queries"]["query_21"]
+            if feature_type == "mrna"
+            else config_json["queries"]["query_23"]
+        ).params(qvalue=field_value)
+        cur = db.session.execute(sql)
+
+        for row in cur.fetchall():
+            x = row[0]
+            y1 = math.log(row[1]) / math.log(2) if row[1] != 0.0 else 0
+            y2 = math.log(row[2]) / math.log(2) if row[2] != 0.0 else 0
+            y3 = math.log(row[3]) / math.log(2) if row[3] != 0.0 else 0
+            y4 = math.log(row[4]) / math.log(2) if row[4] != 0.0 else 0
+            y5 = math.log(row[5]) / math.log(2) if row[5] != 0.0 else 0
+            plotData3.append([x, y1, y2, y3, y4, y5])
+
+        do_list = []
+        for row in expressionTable1:
+            parts = row[0].split("/")[0].split(":")
+            if parts[0] == "DOID":
+                do_list.append(parts[1].strip())
+        do_list = sorted(set(do_list))
 
         # Generate other data as needed
         bgee_table1, bgee_table2 = get_data_set_table(
             config_json, field_value, 1, ["uniprotAc"]
         )
         bgee_table1, bgee_table2 = filter_bgee_table(
-            config_json, expression_table, bgee_table1, bgee_table2
+            config_json, do_list, bgee_table1, bgee_table2
         )
 
         textmine_table1, textmine_table2 = get_data_set_table(
             config_json, field_value, 6, ["uniprotAc", "geneMentioned", "isSamePatient"]
         )
 
+        for i in range(0, len(expressionTable1)):
+            expressionTable1[i] = expressionTable1[i][:2] + expressionTable1[i][3:]
+
+        if feature_type == "mirna":
+            plotData2 = []
+
         out_json = {
             "taskStatus": 1,
             "inJson": in_json,
             "pageconf": config_json["pageconf"]["transcriptview"],
-            "expressiontable": expression_table,
+            "expressiontable": expressionTable1,
             "bgeetable": bgee_table1,
             "textminetable": textmine_table1,
+            "plotdata1": plotData1,
+            "plotdata2": plotData2,
+            "plotdata3": plotData3,
+            "plotxlabel1": config_json["pageconf"]["transcriptview"]["plotxlabel_1"],
+            "plotxlabel2": config_json["pageconf"]["transcriptview"]["plotxlabel_2"],
+            "plotxlabel3": config_json["pageconf"]["transcriptview"]["plotxlabel_3"],
+            "plotylabel1": config_json["pageconf"]["transcriptview"]["plotylabel_1"],
+            "plotylabel2": config_json["pageconf"]["transcriptview"]["plotylabel_2"],
+            "plotylabel3": config_json["pageconf"]["transcriptview"]["plotylabel_3"],
+            "plotann2": plotAnn2,
         }
 
-        # Add file downloads
+        query = in_json["fieldvalue"]
+        for key in out_json["pageconf"]:
+            out_json["pageconf"][key] = out_json["pageconf"][key].replace(
+                "QVALUE", query
+            )
+            out_json["pageconf"][key] = out_json["pageconf"][key].replace(
+                "SYMBOL", feature_name
+            )
+            out_json["pageconf"][key] = out_json["pageconf"][key].replace(
+                "BIOMUTAURL", config_json["urls"]["biomutaurl"] + query
+            )
+
+        expressionTable2: list = []
+        row = ["Primary ID"] + expressionTable1[0]
+        expressionTable2.append(row)
+        for i in range(2, len(expressionTable1)):
+            row = [field_value] + expressionTable1[i]
+            expressionTable2.append(row)
+
         out_json["downloadfiles"] = []
         out_json["downloadfiles"].append(
-            dump_csv_file(expression_table, config_json, "de-")
+            dump_csv_file(expressionTable2, config_json, "de-")
         )
         out_json["downloadfiles"].append(
             dump_csv_file(bgee_table2, config_json, "bgee-")
