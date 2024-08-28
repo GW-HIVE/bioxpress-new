@@ -437,6 +437,6 @@ def transcript_search(in_json: dict) -> dict:
         with open(logFile, "w") as FW:
             FW.write("%s" % (traceback.format_exc()))
         msg = "Service error! Please see %s-error.log for details.<br><br>" % (
-            config_json["module"].lower()
+            config_json["project"].lower()
         )
         return {"taskStatus": 0, "errorMsg": msg}

@@ -128,8 +128,8 @@ def search_cancer(in_json: dict):
             "pageconf": config_json["pageconf"]["cancerview"],
             "searchresults": objList1,
             "plotdata1": plotData1,
-            "plotxlabel1": config_json["pageconf"]["cancerview"]["plotxlabel1"],
-            "plotylabel1": config_json["pageconf"]["cancerview"]["plotylabel1"],
+            "plotxlabel1": config_json["pageconf"]["cancerview"]["plotxlabel_1"],
+            "plotylabel1": config_json["pageconf"]["cancerview"]["plotylabel_1"],
             "plotann1": plotAnn1,
         }
 
@@ -159,6 +159,6 @@ def search_cancer(in_json: dict):
         with open(logFile, "w") as FW:
             FW.write("%s" % (traceback.format_exc()))
         msg = "Service error! Please see %s-error.log for details.<br><br>" % (
-            config_json["module"].lower()
+            config_json["project"].lower()
         )
         return {"taskStatus": 0, "errorMsg": msg}
