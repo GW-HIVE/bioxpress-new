@@ -185,7 +185,13 @@ def get_transcript_data(in_json: dict) -> dict:
         sql = text(config_json["queries"]["query_14"]).params(qvalue=field_value)
         result = db.session.execute(sql)
         row = result.fetchone()
-        feature_id, feature_type, feature_name = row[0], row[1], row[2]  # type: ignore
+        if row is None:
+            return {
+                "errorMsg": "No results were found",
+                "inJson": {"fieldvalue": field_value},
+                "taskStatus": 0,
+            }
+        feature_id, feature_type, feature_name = row[0], row[1], row[2]
 
         # Fetch expression table data
         sql = text(config_json["queries"]["query_2"]).params(qvalue=field_value)
