@@ -36,7 +36,7 @@
     "query_31": "SELECT A.featureName, B.subjectsRatio, B.countOne, B.logFC, B.pValue, B.adjPValue, B.sigFlag, B.deDirection, B.pmid FROM biox_feature A, biox_level B WHERE A.featureId = B.featureId AND B.cancerId = :qvalue1 AND A.featureType = :qvalue2 AND B.deDirection = :qvalue3 AND CAST(B.adjPValue AS decimal(9,4)) < :qvalue4 AND NOT B.adjPValue ='NA'",
     "query_32": "SELECT A.featureName, B.subjectsRatio, B.countOne, B.logFC, B.pValue, B.adjPValue, B.sigFlag, B.deDirection, B.pmid FROM biox_feature A, biox_level B WHERE A.featureId = B.featureId AND B.cancerId = :qvalue1 AND A.featureType = :qvalue2 AND CAST(B.adjPValue AS decimal(9,4)) < :qvalue4 AND NOT B.adjPValue ='NA'",
     "query_33": "SELECT A.featureName, B.subjectsRatio, B.countOne, B.logFC, B.pValue, B.adjPValue, B.sigFlag, B.deDirection, B.pmid FROM biox_feature A, biox_level B WHERE A.featureId = B.featureId AND B.cancerId = :qvalue1 AND A.featureType = :qvalue2 AND B.deDirection = :qvalue3 AND CAST(B.adjPValue AS decimal(9,4)) < :qvalue4 AND ABS(CAST(B.logFC AS decimal(9,4))) > :qvalue5 AND B.adjPValue != 'NA' AND B.logFC != 'NA'",
-    "query_4": "SELECT id, name, type from biox_dataset_fields where datasetId = :qvalue1",
+    "query_4": "SELECT id, name, type from biox_dataset_fields where datasetId = :qvalue",
     "query_41": "SELECT recordId, fieldId, value from biox_dataset_stringvalues where recordId in (select id from biox_dataset_records where datasetId = :qvalue1 AND mainId = :qvalue2)",
     "query_42": "SELECT recordId, fieldId, value from biox_dataset_numericvalues where recordId in (select id from biox_dataset_records where datasetId = :qvalue1 AND mainId = :qvalue2)"
   },
