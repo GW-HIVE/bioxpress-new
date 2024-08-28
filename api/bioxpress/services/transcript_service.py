@@ -23,7 +23,7 @@ def dump_csv_file(data_frame, config_json, file_prefix):
 
 def get_data_set_table(config_json, field_value, dataset_id, exclude_field_list):
     cur = db.session.execute(
-        text(config_json["queries"]["query_4"].params(qvalue=str(dataset_id)))
+        text(config_json["queries"]["query_4"]).params(qvalue=str(dataset_id))
     )
     field_info = {"name": {}, "type": {}}
     field_type = {"string": {}, "numeric": {}}
