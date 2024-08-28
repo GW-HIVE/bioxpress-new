@@ -22,23 +22,23 @@
   },
   "tmppath": "/tmp/",
   "queries": {
-    "query_1": "SELECT DISTINCT A.featureId,A.featureName,A.featureType FROM biox_feature A, biox_xref B, biox_level C WHERE A.featureId = B.featureId AND A.featureId = C.featureId AND ( lower(A.featureName) LIKE '%QVALUE%' OR lower(B.xrefId) LIKE '%QVALUE%') AND B.xrefId != '-'",
-    "query_11": "SELECT xrefSrc, xrefId FROM biox_xref WHERE featureId = 'QVALUE'",
-    "query_12": "SELECT doName from biox_cancer where id != 1 AND id IN (SELECT cancerId from biox_level where featureId = QVALUE and lower(sigFlag) = 'yes' AND lower(deDirection) = 'up')",
-    "query_13": "SELECT doName from biox_cancer where id != 1 AND id IN (SELECT cancerId from biox_level where featureId = QVALUE and lower(sigFlag) = 'yes' AND lower(deDirection) = 'down')",
-    "query_14": "SELECT featureId, featureType, featureName FROM biox_feature WHERE featureId IN (SELECT DISTINCT featureId FROM biox_xref WHERE lower(xrefId) = 'QVALUE' AND xrefSrc IN ('UniProtKB', 'hgnc'))",
-    "query_15": "SELECT xrefSrc, xrefId FROM biox_xref WHERE featureId IN (SELECT DISTINCT featureId FROM biox_feature WHERE featureName =  'QVALUE')",
-    "query_2old": "SELECT C.doName,B.subjectsRatio,B.countOne, B.logFC,B.pValue,B.adjPValue,B.sigFlag,B.deDirection FROM biox_level B,  biox_cancer C WHERE B.cancerId = C.id AND C.id != 1 AND B.featureId IN (SELECT DISTINCT featureId FROM biox_xref WHERE lower(xrefId) = 'QVALUE' AND xrefSrc IN ('UniProtKB', 'hgnc')) AND B.pValue != 'NA' AND B.adjPValue != 'NA'",
-    "query_2": "SELECT C.sampleSynonym,B.subjectsRatio,B.countOne, B.logFC,B.pValue,B.adjPValue,B.sigFlag,B.deDirection FROM biox_level B,  biox_sample C WHERE B.sampleId = C.sampleId AND B.featureId IN (SELECT DISTINCT featureId FROM biox_xref WHERE lower(xrefId) = 'QVALUE' AND xrefSrc IN ('UniProtKB', 'hgnc')) AND B.pValue != 'NA' AND B.adjPValue != 'NA'",
-    "query_21": "SELECT B.doName,  A.min,A.firstQuantile,A.secondQuantile,A.thirdQuantile,A.max FROM biox_boxplot A, biox_cancer B WHERE A.cancerId = B.id AND B.id != 1 AND A.boxplotType = 'HISEQ' AND  A.featureId IN (SELECT DISTINCT featureId FROM biox_xref WHERE lower(xrefId) = 'QVALUE' AND xrefSrc = 'UniProtKB');",
-    "query_22": "select A.value from biox_dataset_stringvalues A, biox_dataset_records B where A.recordId = B.id AND A.fieldId in (16, 44, 58) AND B.mainId = 'QVALUE'",
-    "query_23": "SELECT B.doName,  A.min,A.firstQuantile,A.secondQuantile,A.thirdQuantile,A.max FROM biox_boxplot A, biox_cancer B WHERE A.cancerId = B.id AND B.id != 1 AND A.boxplotType = 'HISEQ' AND  A.featureId IN (SELECT DISTINCT featureId FROM biox_xref WHERE lower(xrefId) = 'QVALUE' AND xrefSrc = 'hgnc');",
-    "query_31": "SELECT A.featureName,B.subjectsRatio,B.countOne,B.logFC,B.pValue,B.adjPValue,B.sigFlag,B.deDirection,B.pmid FROM biox_feature A, biox_level B WHERE A.featureId = B.featureId AND B.cancerId = QVALUE1 AND A.featureType = 'QVALUE2' AND B.deDirection = 'QVALUE3' AND CAST(B.adjPValue AS decimal(9,4)) < QVALUE4 AND NOT B.adjPValue ='NA'",
-    "query_32": "SELECT A.featureName,B.subjectsRatio,B.countOne,B.logFC,B.pValue,B.adjPValue,B.sigFlag,B.deDirection,B.pmid FROM biox_feature A, biox_level B WHERE A.featureId = B.featureId AND B.cancerId = QVALUE1 AND A.featureType = 'QVALUE2' AND CAST(B.adjPValue AS decimal(9,4)) < QVALUE4 AND NOT B.adjPValue ='NA'",
-    "query_33": "SELECT A.featureName,B.subjectsRatio,B.countOne,B.logFC,B.pValue,B.adjPValue,B.sigFlag,B.deDirection,B.pmid FROM biox_feature A, biox_level B WHERE A.featureId = B.featureId AND B.cancerId = QVALUE1 AND A.featureType = 'QVALUE2' AND B.deDirection = 'QVALUE3' AND CAST(B.adjPValue AS decimal(9,4)) < QVALUE4 AND ABS(CAST(B.logFC AS decimal(9,4))) > QVALUE5 AND B.adjPValue != 'NA' AND B.logFC != 'NA'",
-    "query_4": "SELECT id, name,type from biox_dataset_fields where datasetId = QVALUE ",
-    "query_41": "SELECT recordId, fieldId, value from biox_dataset_stringvalues where recordId in (select id from biox_dataset_records where datasetId = QVALUE1 AND mainId = 'QVALUE2' )",
-    "query_42": "SELECT recordId, fieldId, value from biox_dataset_numericvalues where recordId in (select id from biox_dataset_records where datasetId = QVALUE1 AND mainId = 'QVALUE2' )"
+    "query_1": "SELECT DISTINCT A.featureId, A.featureName, A.featureType FROM biox_feature A, biox_xref B, biox_level C WHERE A.featureId = B.featureId AND A.featureId = C.featureId AND (lower(A.featureName) LIKE :qvalue OR lower(B.xrefId) LIKE :qvalue) AND B.xrefId != '-'",
+    "query_11": "SELECT xrefSrc, xrefId FROM biox_xref WHERE featureId = :qvalue",
+    "query_12": "SELECT doName from biox_cancer where id != 1 AND id IN (SELECT cancerId from biox_level where featureId = :qvalue and lower(sigFlag) = 'yes' AND lower(deDirection) = 'up')",
+    "query_13": "SELECT doName from biox_cancer where id != 1 AND id IN (SELECT cancerId from biox_level where featureId = :qvalue and lower(sigFlag) = 'yes' AND lower(deDirection) = 'down')",
+    "query_14": "SELECT featureId, featureType, featureName FROM biox_feature WHERE featureId IN (SELECT DISTINCT featureId FROM biox_xref WHERE lower(xrefId) = :qvalue AND xrefSrc IN ('UniProtKB', 'hgnc'))",
+    "query_15": "SELECT xrefSrc, xrefId FROM biox_xref WHERE featureId IN (SELECT DISTINCT featureId FROM biox_feature WHERE featureName = :qvalue)",
+    "query_2old": "SELECT C.doName, B.subjectsRatio, B.countOne, B.logFC, B.pValue, B.adjPValue, B.sigFlag, B.deDirection FROM biox_level B, biox_cancer C WHERE B.cancerId = C.id AND C.id != 1 AND B.featureId IN (SELECT DISTINCT featureId FROM biox_xref WHERE lower(xrefId) = :qvalue AND xrefSrc IN ('UniProtKB', 'hgnc')) AND B.pValue != 'NA' AND B.adjPValue != 'NA'",
+    "query_2": "SELECT C.sampleSynonym ,B.subjectsRatio, B.countOne, B.logFC, B.pValue, B.adjPValue, B.sigFlag, B.deDirection FROM biox_level B, biox_sample C WHERE B.sampleId = C.sampleId AND B.featureId IN (SELECT DISTINCT featureId FROM biox_xref WHERE lower(xrefId) = :qvalue AND xrefSrc IN ('UniProtKB', 'hgnc')) AND B.pValue != 'NA' AND B.adjPValue != 'NA'",
+    "query_21": "SELECT B.doName, A.min, A.firstQuantile, A.secondQuantile, A.thirdQuantile, A.max FROM biox_boxplot A, biox_cancer B WHERE A.cancerId = B.id AND B.id != 1 AND A.boxplotType = 'HISEQ' AND A.featureId IN (SELECT DISTINCT featureId FROM biox_xref WHERE lower(xrefId) = :qvalue AND xrefSrc = 'UniProtKB')",
+    "query_22": "SELECT A.value from biox_dataset_stringvalues A, biox_dataset_records B where A.recordId = B.id AND A.fieldId in (16, 44, 58) AND B.mainId = :qvalue",
+    "query_23": "SELECT B.doName, A.min, A.firstQuantile, A.secondQuantile, A.thirdQuantile, A.max FROM biox_boxplot A, biox_cancer B WHERE A.cancerId = B.id AND B.id != 1 AND A.boxplotType = 'HISEQ' AND A.featureId IN (SELECT DISTINCT featureId FROM biox_xref WHERE lower(xrefId) = :qvalue AND xrefSrc = 'hgnc')",
+    "query_31": "SELECT A.featureName, B.subjectsRatio, B.countOne, B.logFC, B.pValue, B.adjPValue, B.sigFlag, B.deDirection, B.pmid FROM biox_feature A, biox_level B WHERE A.featureId = B.featureId AND B.cancerId = :qvalue1 AND A.featureType = :qvalue2 AND B.deDirection = :qvalue3 AND CAST(B.adjPValue AS decimal(9,4)) < :qvalue4 AND NOT B.adjPValue ='NA'",
+    "query_32": "SELECT A.featureName, B.subjectsRatio, B.countOne, B.logFC, B.pValue, B.adjPValue, B.sigFlag, B.deDirection, B.pmid FROM biox_feature A, biox_level B WHERE A.featureId = B.featureId AND B.cancerId = :qvalue1 AND A.featureType = :qvalue2 AND CAST(B.adjPValue AS decimal(9,4)) < :qvalue4 AND NOT B.adjPValue ='NA'",
+    "query_33": "SELECT A.featureName, B.subjectsRatio, B.countOne, B.logFC, B.pValue, B.adjPValue, B.sigFlag, B.deDirection, B.pmid FROM biox_feature A, biox_level B WHERE A.featureId = B.featureId AND B.cancerId = :qvalue1 AND A.featureType = :qvalue2 AND B.deDirection = :qvalue3 AND CAST(B.adjPValue AS decimal(9,4)) < :qvalue4 AND ABS(CAST(B.logFC AS decimal(9,4))) > :qvalue5 AND B.adjPValue != 'NA' AND B.logFC != 'NA'",
+    "query_4": "SELECT id, name, type from biox_dataset_fields where datasetId = :qvalue1",
+    "query_41": "SELECT recordId, fieldId, value from biox_dataset_stringvalues where recordId in (select id from biox_dataset_records where datasetId = :qvalue1 AND mainId = :qvalue2)",
+    "query_42": "SELECT recordId, fieldId, value from biox_dataset_numericvalues where recordId in (select id from biox_dataset_records where datasetId = :qvalue1 AND mainId = :qvalue2)"
   },
   "queryform": {
     "boxlist": [
@@ -246,6 +246,53 @@
         "string",
         "string"
       ]
+    }
+  },
+  "urls": {
+    "pubmedurl": "https://www.ncbi.nlm.nih.gov/pubmed/"
+  },
+  "pageconf": {
+    "about": {
+      "tabletitle": "BioXpress v3.0 statistics"
+    },
+    "searchresults": {
+      "tabledesc": "Please click on the \"Primary Feature ID\" to view detailed expression results."
+    },
+    "transcriptview": {
+      "plotdesc_1": "This chart displays the frequencies of patients following each expression trend for QVALUE in all relevant cancer types: over-expression is denoted by the blue series, and under-expression is denoted by the orange bars. For each patient, log2 fold change (log2FC) values greater than zero are considered to follow an over-expression trend, less than zero to follow under-expression trend. Patients with log2FC = 0 were excluded in the figure. Note that all patients are included in this graphic despite statistical significance of the trend.",
+      "plotdesc_2": "This chart shows the proportion of patients whose individual expression trend (over- or under-expression) matches the significant trend reported for QVALUE across different cancer types, with each colored series denoting a different threshold. The \"+\" and \"-\" indicate the significant trend for the associated cancer, representing over- and under-expression, respectively. Green bars: each bar represents the frequency of patients whose individual QVALUE expression trend matches the significant trend where differential expression is defined as |log2FC| > 0. Blue bars: each bar represents the frequency of patients whose individual QVALUE expression has log2FC greater than the pooled cancer-wise log2FC if QVALUE if the gene is reported to be over-expressed, or less than the pooled cancer-wise log2FC if it is under-expressed.",
+      "plotdesc_3": "This chart displays the comprehensive tumor expression of QVALUE, including expression from those samples with matched normal data and all unpaired tumor samples from TCGA. Expression levels for mRNA are log2(raw read counts), while for miRNA, they are log2(RPKM).",
+      "tablefootnote": "",
+      "plottitle_1": "View expression trend frequency plot",
+      "plottitle_2": "View expression trend significance plot",
+      "plottitle_3": "View tumor-only expression plot",
+      "plottitle_4": "Differential expression results",
+      "plottitle_5": "Expression profile in normal human tissues",
+      "plottitle_6": "Literature mining",
+      "plotxlabel_1": "Cancer type",
+      "plotxlabel_2": "Cancer type",
+      "plotxlabel_3": "Cancer type",
+      "plotylabel_1": "Counts and frequencies of expression trends",
+      "plotylabel_2": "Frequency (%) of expression trends",
+      "plotylabel_3": "Log2(expression)",
+      "plotylegend1_y1": "Over-expression",
+      "plotylegend1_y2": "Under-expression",
+      "plotylegend2_y1": "Patients matching significant trend with threshold of patient |log2FC| > 0",
+      "plotylegend2_y2": "Patients matching significant trend with threshold of patient |log2FC| > cancer |log2FC|",
+      "tabletitle": "Differential expression for QVALUE (SYMBOL).",
+      "tabledesc": "This table lists all differential expression analysis results for QVALUE. Manually curated records, based on literature review, are also included for mRNAs when available.<br>Record pages in other resources: <a href=\"BIOMUTAURL\">BioMuta</a>, <a href=\"https://www.oncomx.org/searchview/?gene=QVALUE\" target=_>OncoMX</a>, <a href=\"http://www.uniprot.org/uniprot/QVALUE\" target=_>UniProtKB</a>.",
+      "filtertitle": "Apply/Reset site filters"
+    },
+    "cancerview": {
+      "plotdesc_1": "This chart shows the proportion of patients whose individual expression trend (over- or under-expression) matches the significant trend reported for the top 20 transcripts in search term, with each colored series denoting a different threshold. The \"+\" and \"-\" indicate the significant trend for the associated hit in search term, representing over- and under-expression, respectively. Green bars: each bar represents the frequency of patients whose individual expression trend matches the significant trend where differential expression is defined as |log2FC| > 0. Blue bars: each bar represents the frequency of patients whose individual expression has log2FC greater than the pooled cancer-wise log2FC if the gene is reported to be over-expressed, or less than the pooled cancer-wise log2FC if it is under-expressed.",
+      "tablefootnote": "xxxx",
+      "plottitle_1": "View plot for top significant differentially expressed hits",
+      "plotxlabel_1": "Top 20 transcripts (sorted by frequency)",
+      "plotylabel_1": "Frequency (%) of expression trends",
+      "plotylegend1_y1": "Patients matching significant trend with threshold of patient |log2FC| > 0",
+      "plotylegend1_y2": "Patients matching significant trend with threshold of patient |log2FC| > cancer |log2FC|",
+      "tabletitle": "Differential expression for search term",
+      "tabledesc": "This table lists all differential expression analysis results for search term. Manually curated records, based on literature review, are also included for mRNAs when available."
     }
   }
 }
