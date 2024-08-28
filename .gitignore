@@ -10,3 +10,4 @@ sql-dump/
 dist/
 build/
 *egg-info/
+csv/
