@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from bioxpress.services.stats_service import get_stats
 from bioxpress.services.transcript_service import get_transcript_data, transcript_search
+from bioxpress.services.cancer_service import search_cancer
 
 # TODO
 # from bioxpress.services.cancer_service import search_cancer, get_cancer_list
@@ -27,12 +28,12 @@ def search_transcript():
     result = transcript_search(input_json)
     return jsonify(result)
 
-# TODO
-# @api_bp.route("/cancerSearch", methods=["POST"])
-# def search_cancer_route():
-#     input_json = request.get_json()
-#     result = search_cancer(input_json)
-#     return jsonify(result)
+
+@api_bp.route("/cancerSearch", methods=["POST"])
+def cancer_search():
+    input_json = request.get_json()
+    result = search_cancer(input_json)
+    return jsonify(result)
 
 
 # TODO
