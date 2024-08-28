@@ -3,6 +3,7 @@ from typing import Any
 import datetime
 from flask import current_app as app
 from sqlalchemy import text
+import sys
 import time
 from bioxpress.db import db
 import subprocess
@@ -162,3 +163,30 @@ def search_cancer(in_json: dict):
             config_json["project"].lower()
         )
         return {"taskStatus": 0, "errorMsg": msg}
+
+
+def get_cancer_list():
+
+    out_json = {"cancerlist": [], "taskstatus": 1}
+
+    try:
+        sql = text(
+            "SELECT DISTINCT A.id, A.doId, A.doName FROM biox_cancer A, biox_level B WHERE A.id = B.cancerId AND A.id != 1"
+        )
+        cursor = db.session.execute(sql)
+        for row in cursor.fetchall():
+            out_json["cancerlist"].append(
+                {"id": row[0], "doid": row[1], "doname": row[2]}
+            )
+
+    except IOError as e:
+        out_json["taskstatus"] = 0
+        out_json["errormsg"] = "I/O error({0}): {1}".format(e.errno, e.strerror)
+    except ValueError as e:
+        out_json["taskstatus"] = 0
+        out_json["errormsg"] = "Could not convert data to an integer."
+    except Exception as e:
+        out_json["taskstatus"] = 0
+        out_json["errormsg"] = "Unexpected error:", sys.exc_info()[0]
+
+    return out_json
