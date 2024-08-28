@@ -12,7 +12,7 @@ from pymysql.cursors import Cursor
 import subprocess
 
 # Path to the SQL dump file to be loaded into the MySQL database
-IN_FILE = "../sql-dump/bioxpress_prd.dump.sql"
+IN_FILE = "../sql-dump/bioxpress_tst.dump.sql"
 # Logger instance to track script execution
 LOGGER = setup_logger(Path(__file__).stem)
 
