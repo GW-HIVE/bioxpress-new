@@ -5,6 +5,8 @@ from flask import current_app as app
 from sqlalchemy import text
 from bioxpress.db import db
 import math
+import traceback
+import subprocess
 
 
 def dump_csv_file(data_frame, config_json, file_prefix):
@@ -348,3 +350,93 @@ def get_transcript_data(in_json: dict) -> dict:
         }
 
     return out_json
+
+
+def transcript_search(in_json: dict) -> dict:
+
+    out_json = {}
+    config_json = app.config["CONFIG_JSON"]
+    # error_msg = ""
+
+    try:
+        # seen = {}
+        qry_hash = {}
+        for obj in in_json["qrylist"]:
+            qry_hash[obj["fieldname"]] = obj["field_value"]
+
+        objList1 = []
+        objList2 = []
+
+        if qry_hash["searchtype"] == "transcriptsearch":
+            field_value = qry_hash["searchvalue1"].lower().strip()
+            sql1 = text(config_json["queries"]["query_1"]).params(qvalue=field_value)
+
+            labellist = config_json["tableheaders"]["transcriptsearchresults"]["labellist"]
+            typelist = config_json["tableheaders"]["transcriptsearchresults"]["typelist"]
+            objList1 = [labellist, typelist]
+            objList2 = [labellist]
+            # featureIdList = []
+
+            cursor1 = db.session.execute(sql1)
+            for row1 in cursor1.fetchall():
+                obj1, obj2 = [""], [""]
+                for j in range(1, len(row1)):
+                    obj1.append(row1[j])
+                    obj2.append(row1[j])
+                sql = text(config_json["queries"]['query_11']).params(qvalue=str(row1[0]))
+                cursor = db.session.execute(sql)
+                tmpList = []
+                xrefHash = {}
+                for row in cursor.fetchall():
+                    key = row[0].lower()
+                    xrefHash[key] = row[1]
+                    tmpList.append(row[0] + ":" + row[1])
+                obj1.append("<br>".join(tmpList))
+                obj2.append(";".join(tmpList))
+
+                sql = text(config_json["queries"]["query_12"]).params(qvalue=str(row1[0]))
+                cursor = db.session.execute(sql)
+                tmpList = []
+                for row in cursor.fetchall():
+                    tmpList.append(row[0])
+                obj1.append("<br>".join(tmpList))
+                obj2.append(";".join(tmpList))
+                sql = text(config_json["queries"]["query_13"]).params(qvalue=str(row1[0]))
+                cursor = db.session.execute(sql)
+                tmpList = []
+                for row in cursor.fetchall():
+                    tmpList.append(row[0])
+                obj1.append("; ".join(tmpList))
+                obj2.append(";".join(tmpList))
+
+                primaryAc = xrefHash["uniprotkb"] if "uniprotkb" in xrefHash else xrefHash["hgnc"]
+                obj1[0] = '<a href"' + config_json["urls"]["transcriptviewurl"] + primaryAc + '">' + primaryAc + "</a>"
+                obj2[0] = primaryAc
+                objList1.append(obj1)
+                objList2.append(obj2)
+
+        out_json = {"taskStatus": 1, "inJson": in_json, "searchresults": objList1}
+        timeStamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H-%M-%S')
+        out_json["pageconf"] = config_json["pageconf"]["searchresults"]
+
+        outputFile = config_json["tmppath"] + "/bioxpress-searchresults-" + timeStamp + ".csv"
+        out_json["downloadfiles"] = ["bioxpress-searchresults-" + timeStamp + ".csv"]
+        # error_msg = "Could not write out CSV file " + outputFile
+
+        FW = open(outputFile, "w")
+        for i in range(0, len(objList2)):
+            FW.write("%s\n" % (",".join(objList2[i])))
+        FW.close()
+        cmd = "chmod 777 " + outputFile
+        subprocess.getoutput(cmd)
+
+        return out_json
+
+    except Exception as e:
+        logFile = "/tmp/%s-error.log" % (config_json["module"].lower())
+        with open(logFile, "w") as FW:
+            FW.write("%s" % (traceback.format_exc()))
+        msg = "Service error! Please see %s-error.log for details.<br><br>" % (
+            config_json["module"].lower()
+        )
+        return {"taskStatus": 0, "errorMsg": msg}
