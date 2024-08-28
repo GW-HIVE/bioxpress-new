@@ -33,10 +33,8 @@ def get_data_set_table(config_json, field_value, dataset_id, exclude_field_list)
         field_info["type"][row[0]] = row[2]
 
     records = {}
-    sql = text(
-        config_json["queries"]["query_41"].params(
-            qvalue1=str(dataset_id), qvalue2=field_value
-        )
+    sql = text(config_json["queries"]["query_41"]).params(
+        qvalue1=str(dataset_id), qvalue2=field_value
     )
     cur = db.session.execute(sql)
 
