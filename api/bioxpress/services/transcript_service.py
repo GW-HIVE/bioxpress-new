@@ -188,11 +188,17 @@ def get_transcript_data(in_json: dict) -> dict:
         result = db.session.execute(sql)
         row = result.fetchone()
         if row is None:
-            return {
-                "errorMsg": "No results were found",
-                "inJson": {"fieldvalue": field_value},
-                "taskStatus": 0,
-            }
+            sql = text(
+                "SELECT xrefId from biox_xref where xrefSrc = 'UniProtKB' AND featureId in (SELECT featureId FROM biox_feature WHERE lower(featureName) = lower(:qvalue)"
+            ).params(qvalue=field_value)
+            result = db.session.execute(sql)
+            row = result.fetchone()
+            if row is None:
+                return {
+                    "errorMsg": "No results were found",
+                    "inJson": {"fieldvalue": field_value},
+                    "taskStatus": 0,
+                }
         feature_id, feature_type, feature_name = row[0], row[1], row[2]
 
         # Fetch expression table data
@@ -371,8 +377,12 @@ def transcript_search(in_json: dict) -> dict:
             field_value = qry_hash["searchvalue1"].lower().strip()
             sql1 = text(config_json["queries"]["query_1"]).params(qvalue=field_value)
 
-            labellist = config_json["tableheaders"]["transcriptsearchresults"]["labellist"]
-            typelist = config_json["tableheaders"]["transcriptsearchresults"]["typelist"]
+            labellist = config_json["tableheaders"]["transcriptsearchresults"][
+                "labellist"
+            ]
+            typelist = config_json["tableheaders"]["transcriptsearchresults"][
+                "typelist"
+            ]
             objList1 = [labellist, typelist]
             objList2 = [labellist]
             # featureIdList = []
@@ -383,7 +393,9 @@ def transcript_search(in_json: dict) -> dict:
                 for j in range(1, len(row1)):
                     obj1.append(row1[j])
                     obj2.append(row1[j])
-                sql = text(config_json["queries"]['query_11']).params(qvalue=str(row1[0]))
+                sql = text(config_json["queries"]["query_11"]).params(
+                    qvalue=str(row1[0])
+                )
                 cursor = db.session.execute(sql)
                 tmpList = []
                 xrefHash = {}
@@ -394,14 +406,18 @@ def transcript_search(in_json: dict) -> dict:
                 obj1.append("<br>".join(tmpList))
                 obj2.append(";".join(tmpList))
 
-                sql = text(config_json["queries"]["query_12"]).params(qvalue=str(row1[0]))
+                sql = text(config_json["queries"]["query_12"]).params(
+                    qvalue=str(row1[0])
+                )
                 cursor = db.session.execute(sql)
                 tmpList = []
                 for row in cursor.fetchall():
                     tmpList.append(row[0])
                 obj1.append("<br>".join(tmpList))
                 obj2.append(";".join(tmpList))
-                sql = text(config_json["queries"]["query_13"]).params(qvalue=str(row1[0]))
+                sql = text(config_json["queries"]["query_13"]).params(
+                    qvalue=str(row1[0])
+                )
                 cursor = db.session.execute(sql)
                 tmpList = []
                 for row in cursor.fetchall():
@@ -409,17 +425,32 @@ def transcript_search(in_json: dict) -> dict:
                 obj1.append("; ".join(tmpList))
                 obj2.append(";".join(tmpList))
 
-                primaryAc = xrefHash["uniprotkb"] if "uniprotkb" in xrefHash else xrefHash["hgnc"]
-                obj1[0] = '<a href"' + config_json["urls"]["transcriptviewurl"] + primaryAc + '">' + primaryAc + "</a>"
+                primaryAc = (
+                    xrefHash["uniprotkb"]
+                    if "uniprotkb" in xrefHash
+                    else xrefHash["hgnc"]
+                )
+                obj1[0] = (
+                    '<a href"'
+                    + config_json["urls"]["transcriptviewurl"]
+                    + primaryAc
+                    + '">'
+                    + primaryAc
+                    + "</a>"
+                )
                 obj2[0] = primaryAc
                 objList1.append(obj1)
                 objList2.append(obj2)
 
         out_json = {"taskStatus": 1, "inJson": in_json, "searchresults": objList1}
-        timeStamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H-%M-%S')
+        timeStamp = datetime.datetime.fromtimestamp(time.time()).strftime(
+            "%Y-%m-%d-%H-%M-%S"
+        )
         out_json["pageconf"] = config_json["pageconf"]["searchresults"]
 
-        outputFile = config_json["tmppath"] + "/bioxpress-searchresults-" + timeStamp + ".csv"
+        outputFile = (
+            config_json["tmppath"] + "/bioxpress-searchresults-" + timeStamp + ".csv"
+        )
         out_json["downloadfiles"] = ["bioxpress-searchresults-" + timeStamp + ".csv"]
         # error_msg = "Could not write out CSV file " + outputFile
 
