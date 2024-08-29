@@ -2,6 +2,7 @@ import os
 import datetime
 import time
 from flask import current_app as app
+from pprint import pprint
 from sqlalchemy import text
 from bioxpress.db import db
 import math
@@ -375,6 +376,8 @@ def get_transcript_data(in_json: dict) -> dict:
 def transcript_search(in_json: dict) -> dict:
 
     out_json = {}
+    print("IN_JSON for transcript search:")
+    pprint(in_json, indent=2)
     config_json = app.config["CONFIG_JSON"]
     # error_msg = ""
 
