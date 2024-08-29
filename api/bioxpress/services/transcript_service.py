@@ -2,7 +2,6 @@ import os
 import datetime
 import time
 from flask import current_app as app
-from pprint import pprint
 from sqlalchemy import text
 from bioxpress.db import db
 import math
@@ -376,8 +375,6 @@ def get_transcript_data(in_json: dict) -> dict:
 def transcript_search(in_json: dict) -> dict:
 
     out_json = {}
-    print("IN_JSON for transcript search:")
-    pprint(in_json, indent=2)
     config_json = app.config["CONFIG_JSON"]
     # error_msg = ""
 
@@ -481,7 +478,7 @@ def transcript_search(in_json: dict) -> dict:
         return out_json
 
     except Exception as e:
-        logFile = "/tmp/%s-error.log" % (config_json["module"].lower())
+        logFile = "/tmp/%s-error.log" % (config_json["project"].lower())
         with open(logFile, "w") as FW:
             FW.write("%s" % (traceback.format_exc()))
         msg = "Service error! Please see %s-error.log for details.<br><br>" % (
