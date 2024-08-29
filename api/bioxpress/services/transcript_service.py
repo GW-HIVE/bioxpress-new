@@ -385,7 +385,7 @@ def transcript_search(in_json: dict) -> dict:
         # seen = {}
         qry_hash = {}
         for obj in in_json["qrylist"]:
-            qry_hash[obj["fieldname"]] = obj["field_value"]
+            qry_hash[obj["fieldname"]] = obj["fieldvalue"]
 
         objList1 = []
         objList2 = []
