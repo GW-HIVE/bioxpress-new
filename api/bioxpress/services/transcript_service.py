@@ -330,7 +330,7 @@ def get_transcript_data(in_json: dict) -> dict:
             "plotann2": plotAnn2,
         }
 
-        query = in_json["fieldvalue"]
+        query = in_json["fieldvalue"].upper()
         for key in out_json["pageconf"]:
             out_json["pageconf"][key] = out_json["pageconf"][key].replace(
                 "QVALUE", query
