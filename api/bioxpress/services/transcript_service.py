@@ -199,6 +199,19 @@ def get_transcript_data(in_json: dict) -> dict:
                     "inJson": {"fieldvalue": field_value},
                     "taskStatus": 0,
                 }
+            protein_accession = row[0]
+            sql = text(config_json["queries"]["query_14"]).params(
+                qvalue=protein_accession
+            )
+            result = db.session.execute(sql)
+            row = result.fetchone()
+            if row is None:
+                return {
+                    "errorMsg": "No results were found",
+                    "inJson": {"fieldvalue": field_value},
+                    "taskStatus": 0,
+                }
+
         feature_id, feature_type, feature_name = row[0], row[1], row[2]
 
         # Fetch expression table data
