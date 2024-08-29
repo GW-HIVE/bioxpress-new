@@ -189,7 +189,7 @@ def get_transcript_data(in_json: dict) -> dict:
         row = result.fetchone()
         if row is None:
             sql = text(
-                "SELECT xrefId from biox_xref where xrefSrc = 'UniProtKB' AND featureId in (SELECT featureId FROM biox_feature WHERE lower(featureName) = lower(:qvalue)"
+                "SELECT xrefId from biox_xref where xrefSrc = 'UniProtKB' AND featureId in (SELECT featureId FROM biox_feature WHERE lower(featureName) = lower(:qvalue))"
             ).params(qvalue=field_value)
             result = db.session.execute(sql)
             row = result.fetchone()
