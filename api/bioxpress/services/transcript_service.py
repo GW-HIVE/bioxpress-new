@@ -211,6 +211,7 @@ def get_transcript_data(in_json: dict) -> dict:
                     "inJson": {"fieldvalue": field_value},
                     "taskStatus": 0,
                 }
+            field_value = protein_accession
 
         feature_id, feature_type, feature_name = row[0], row[1], row[2]
 
