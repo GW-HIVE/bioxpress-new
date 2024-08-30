@@ -1,14 +1,14 @@
 {
   "project": "bioxpress-api",
   "api_port": {
-    "prd": "",
+    "prd": "8085",
     "tst": "8085"
   },
   "data_path": "/data/shared/bioxpress/",
   "dbinfo": {
     "dbname": "bioxpress_api",
     "port": {
-      "prd": "",
+      "prd": "8086",
       "tst": "8086"
     },
     "bridge_network": "bioxpress_api_backend_network",
