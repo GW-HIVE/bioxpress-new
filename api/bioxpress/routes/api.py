@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_from_directory
 from bioxpress.services.stats_service import get_stats
 from bioxpress.services.transcript_service import get_transcript_data, transcript_search
 from bioxpress.services.cancer_service import search_cancer, get_cancer_list
@@ -40,3 +40,10 @@ def cancer_search():
 def get_cancer_list_route():
     result = get_cancer_list()
     return jsonify(result)
+
+@api_bp.route("/download/<filename>", methods=["GET"])
+def download_file(filename):
+    try:
+        return send_from_directory(directory="/tmp", path=filename, as_attachment=True)
+    except Exception as e:
+        return jsonify({"taskStatus": 0, "errorMsg": str(e)}, 500)
